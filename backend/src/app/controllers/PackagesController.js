@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Packages from '../models/Packages';
 import Recipients from '../models/Recipients';
 import Couriers from '../models/Couriers';
@@ -57,8 +58,16 @@ class PackagesController {
     return res.json({ id, recipient_id, deliveryman_id, product });
   }
 
-  async index(_, res) {
-    const packages = await Packages.findAll();
+  async index(req, res) {
+    const { product } = req.query;
+
+    const packages = await Packages.findAll({
+      where: {
+        product: {
+          [Op.like]: `%${product}%`,
+        },
+      },
+    });
 
     return res.json(packages);
   }

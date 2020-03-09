@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 
 import Couriers from '../models/Couriers';
 import File from '../models/File';
@@ -34,13 +35,18 @@ class CouriersController {
   }
 
   async index(req, res) {
-    const { page = 1 } = req.query;
+    const { page = 1, name } = req.query;
 
     const couriers = await Couriers.findAll({
       order: ['id'],
       attributes: ['id', 'name', 'email'],
       limit: 10,
       offset: (page - 1) * 10,
+      where: {
+        name: {
+          [Op.like]: `%${name}%`,
+        },
+      },
       include: [
         { model: File, as: 'avatar', attributes: ['name', 'path', 'url'] },
       ],
